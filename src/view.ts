@@ -1,25 +1,35 @@
 import { Store } from "redux";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable, Observer } from "rxjs";
+import { map } from "rxjs/operators";
 
 // move me to another file
 export const VIEWACTION_EVENT = 'viewaction';
-export abstract class ViewElement extends HTMLElement {
+
+interface Mapper<T> {
+    (value: T, index: number): T
+}
+
+export abstract class ViewElement<T> extends HTMLElement {
+
+    protected observable: Observable<T>;
 
     constructor() {
         super();
     }
 
-    // will be called by subscription when data has been changed
-    // subscriber.map(value => value[path]).distinctValues()
-    abstract update(state?: any): void;
+    abstract update(state?: T): void;
 
     connectedCallback() {
-        console.log(`connected: ${this.localName} for state:${this.getAttribute('state')}`);
-        // subscribe the element to the observer here
+        const state = this.getAttribute('state');
+        let observer = this.observable
+        if (typeof state === 'string' && state.trim().length > 0) {
+            const mapper = new Function('state', 'index', 'return state.' + this.getAttribute('state')) as Mapper<T>;
+            observer = observer.pipe(map(mapper));
+        }
+        observer.subscribe((next: T) => this.update(next));
     }
     disconnectedCallback() {
         console.log(`disconnected: ${this.localName}`);
-        // unsubscribe here
     }
 
     dispatch(type: string, detail?: any) {
@@ -38,6 +48,9 @@ export abstract class ViewElement extends HTMLElement {
 export default (store: Store, element: Element) => {
     const subject = new BehaviorSubject(store.getState());
     store.subscribe(() => subject.next(store.getState()));
+    Object.defineProperty(ViewElement.prototype, 'observable', {
+        get: () => subject
+    });
     element.addEventListener(VIEWACTION_EVENT, (event: CustomEvent) => {
         // event is prevented by the user
         if (event.defaultPrevented) {
