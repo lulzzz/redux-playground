@@ -7,6 +7,8 @@ export class FeatureBElement extends ViewElement<any> {
         this.attachShadow({ mode: 'open' });
     }
     update(state?: any) {
+        console.log(`-------------RENDER ME: ${this.nodeName}`);
+        // lets use our nice incremental-dom here?
         this.shadowRoot.innerHTML = `<dl>
         <dt>title:</dt>
         <dd>${state.title}</dd>

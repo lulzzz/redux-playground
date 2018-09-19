@@ -9,7 +9,10 @@ export class FeatureAElement extends ViewElement<any> {
     }
 
     update(state?: any) {
+        console.log(`-------------RENDER ME: ${this.nodeName}`);
         this.shadowRoot.innerHTML = `<dl>
+        <button view-action="addsomething">add something</button>
+        <span>${state.date ? state.date : ''}</span>
         <dt>title:</dt>
         <dd>${state.title}</dd>
         <dt>description:</dt>

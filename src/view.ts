@@ -1,6 +1,6 @@
 import { Store } from "redux";
-import { BehaviorSubject, Observable, Observer } from "rxjs";
-import { map } from "rxjs/operators";
+import { BehaviorSubject, Observable, Observer, } from "rxjs";
+import { map, distinctUntilChanged } from "rxjs/operators";
 
 // move me to another file
 export const VIEWACTION_EVENT = 'viewaction';
@@ -9,7 +9,7 @@ interface Mapper<T> {
     (value: T, index: number): T
 }
 
-export abstract class ViewElement<T> extends HTMLElement {
+export abstract class ViewElement<T> extends HTMLElement implements EventListenerObject {
 
     protected observable: Observable<T>;
 
@@ -26,13 +26,38 @@ export abstract class ViewElement<T> extends HTMLElement {
             const mapper = new Function('state', 'index', 'return state.' + this.getAttribute('state')) as Mapper<T>;
             observer = observer.pipe(map(mapper));
         }
-        observer.subscribe((next: T) => this.update(next));
+        observer.pipe(distinctUntilChanged()).subscribe((next: T) => this.update(next));
+        this.addEventListener('click', this);
     }
     disconnectedCallback() {
         console.log(`disconnected: ${this.localName}`);
+        this.removeEventListener('click', this);
     }
 
-    dispatch(type: string, detail?: any) {
+    handleEvent(event: Event) {
+        if (event.defaultPrevented) {
+            return;
+        }
+        if (event.type === 'click') {
+            // is there an action associated ??
+            // get the composed path and make sure the element is part of this... so that it does not steal actions
+            let elements: Element[] = (event as any).composedPath();
+            for (let i = 0, ii = elements.length; i < ii; i++) {
+                let element = elements[i];
+                if (!(element.nodeType === Node.ELEMENT_NODE && this.shadowRoot.contains(element))) {
+                    break;
+                }
+                const action = element.getAttribute('view-action');
+                if(action) {
+                    this.action(action);
+                    break;
+                }
+            }
+            console.log(event.type, (event as any).composedPath());
+        }
+    }
+
+    action(type: string, detail?: any) {
         const event = new CustomEvent(VIEWACTION_EVENT, {
             cancelable: true,
             bubbles: true,
