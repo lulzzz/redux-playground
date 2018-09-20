@@ -7,7 +7,7 @@ import reducerRegistry from '../redux/reducerRegistry';
 import logger from '../redux/logger';
 import createSagaMiddleware from 'redux-saga'
 
-const initialState = {};// load from storage
+const initialState = {};
 const combine = (reducers: Reducers) => {
     const reducerNames = Object.keys(reducers);
     if (reducerNames.length <= 0) {

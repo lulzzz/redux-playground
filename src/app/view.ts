@@ -82,7 +82,7 @@ export default (store: Store, element: Element) => {
     Object.defineProperty(ViewElement.prototype, 'observable', {
         get: () => subject
     });
-    element.addEventListener(VIEWACTION_EVENT, (event: CustomEvent) => {
+    element.ownerDocument.addEventListener(VIEWACTION_EVENT, (event: CustomEvent) => {
         // event is prevented by the user
         if (event.defaultPrevented) {
             return;

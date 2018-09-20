@@ -1,6 +1,6 @@
 import { state } from './state'
 import { FeatureBElement } from './element';
-import { reducerRegistry } from '../../app';
+import app from '../../app';
 
-reducerRegistry.register('b', state);
+app.reducer('b', state);
 customElements.define('feature-b', FeatureBElement);
