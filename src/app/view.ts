@@ -1,7 +1,7 @@
 import { Store } from "redux";
-import { BehaviorSubject, Observable, Observer, } from "rxjs";
+import { BehaviorSubject, Observable, } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
-
+import actionRegistry from './redux/actionRegistry';
 // move me to another file
 export const VIEWACTION_EVENT = 'viewaction';
 
@@ -22,7 +22,7 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
     connectedCallback() {
         const state = this.getAttribute('state');
         console.log(this);
-        if(!this.observable) {
+        if (!this.observable) {
             return;
         }
 
@@ -53,7 +53,7 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
                     break;
                 }
                 const action = element.getAttribute('view-action');
-                if(action) {
+                if (action) {
                     this.action(action);
                     break;
                 }
@@ -89,17 +89,14 @@ export default (store: Store, element: Element) => {
         }
         const { type, data } = event.detail;
         // dispatch the action on the store
-        store.dispatch({
-            type, data
-        });
+        // needs an action resolver which it can call to get the registered action 
+        // like -> store.dispatch(actionRegistry(type)(data));
+        
+        const action = actionRegistry.resolve<any>(type);
+        console.log(type, action)
+        if (action) {
+            store.dispatch(action(data));
+        }
     });
-
-    // set up event listeners for custom event : action
-    // set up rerender of elements
-    // subscribe elements to subscriber using scheduler raf
-    // should return a method or something to subscribe/unsubscribe elements.....
-
-    // where to store the store variable so that it can be accessed by view ??? using a Symbol
-    // there should be no notion of the store / redux / rxjs in the view..the view should be Vanilla HTML/JavaScript
 
 };
