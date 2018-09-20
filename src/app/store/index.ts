@@ -5,7 +5,7 @@ import { Reducers } from '../redux/reducerRegistry';
 
 import reducerRegistry from '../redux/reducerRegistry';
 import logger from '../redux/logger';
-import thunkMiddleware from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga'
 
 const initialState = {};// load from storage
 const combine = (reducers: Reducers) => {
@@ -22,11 +22,11 @@ const combine = (reducers: Reducers) => {
 };
 
 const reducer = combine(reducerRegistry.entries);
-const store = createStore(
+export const sagaMiddleware = createSagaMiddleware();
+export const store = createStore(
     reducer,
     initialState,
-    applyMiddleware(thunkMiddleware, logger));
+    applyMiddleware(logger, sagaMiddleware));
 
 reducerRegistry.setChangeListener((reducers: Reducers) => store.replaceReducer(combine(reducers)));
 
-export default store;

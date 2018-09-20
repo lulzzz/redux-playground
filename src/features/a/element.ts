@@ -17,7 +17,8 @@ export class FeatureAElement extends ViewElement<any> {
         <dd>${state.title}</dd>
         <dt>description:</dt>
         <dd>${state.description}</dd>
-</dl>`;
+</dl>
+<pre>${JSON.stringify(state)}</pre>`;
     }
 
 }
