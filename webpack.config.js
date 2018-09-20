@@ -1,16 +1,18 @@
 const path = require('path');
-
+const webpack = require("webpack");
 const dist = path.join(__dirname, "dist");
 
 module.exports = {
     entry: {
-        bundle: './src/index.ts',
+        app: './src/app/index.ts',
+        feature_a: './src/features/a',
+        feature_b: './src/features/b',
         vendor: [
             "rxjs",
             "redux"
         ]
     },
-    
+
     devtool: 'inline-source-map',
     module: {
         rules: [{
@@ -25,6 +27,25 @@ module.exports = {
     output: {
         filename: '[name].js',
         path: dist
+    },
+    optimization: {
+        splitChunks: {
+           cacheGroups: {
+               app: {
+                chunks: 'initial',
+                name: 'app',
+                test: 'app',
+                enforce: true
+               },
+               vendor: {
+                   chunks: 'initial',
+                   name: 'vendor',
+                   test: /node_modules/,
+                   enforce: true
+               }
+           }
+        },
+        runtimeChunk: 'single'
     },
     devServer: { inline: true, hot: true }
 };

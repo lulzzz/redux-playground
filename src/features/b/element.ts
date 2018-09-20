@@ -1,4 +1,4 @@
-import { ViewElement } from "../../view";
+import { ViewElement } from "../../app";
 
 // replace <any>
 export class FeatureBElement extends ViewElement<any> {

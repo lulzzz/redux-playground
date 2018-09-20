@@ -21,9 +21,14 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
 
     connectedCallback() {
         const state = this.getAttribute('state');
-        let observer = this.observable
+        console.log(this);
+        if(!this.observable) {
+            return;
+        }
+
+        let observer = this.observable;
         if (typeof state === 'string' && state.trim().length > 0) {
-            const mapper = new Function('state', 'index', 'return state.' + this.getAttribute('state')) as Mapper<T>;
+            const mapper = new Function('state', 'index', 'return state.' + state) as Mapper<T>;
             observer = observer.pipe(map(mapper));
         }
         observer.pipe(distinctUntilChanged()).subscribe((next: T) => this.update(next));
@@ -73,6 +78,7 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
 export default (store: Store, element: Element) => {
     const subject = new BehaviorSubject(store.getState());
     store.subscribe(() => subject.next(store.getState()));
+    console.log('define me', store);
     Object.defineProperty(ViewElement.prototype, 'observable', {
         get: () => subject
     });
