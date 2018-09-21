@@ -6,7 +6,6 @@ module.exports = {
     entry: {
         app: './src/app/index.ts',
         feature_a: './src/features/a',
-        feature_b: './src/features/b',
         vendor: [
             "rxjs",
             "redux"

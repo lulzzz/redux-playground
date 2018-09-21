@@ -3,7 +3,7 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "noImplicitAny": true,
-        "module": "es6",
+        "module": "esNext",
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -12,6 +12,7 @@
         "jsx": "react",
         "typeRoots": [
             "node_modules/@types"
-        ]
+        ],
+        "lib": ["es2017", "dom"]
     }
 }

@@ -1,13 +1,9 @@
-import { Action, AnyAction } from "redux";
-
+import { AnyAction } from "redux";
+import { A_LOAD, A_LOAD_ASYNC } from './actions';
 export function state(state = { title: 'feature A', description: 'Feature A Description' }, action: AnyAction) {
-    console.log(`--- action called on feature A: ${action.type}`, action);
-
     switch (action.type.toUpperCase()) {
-        case "ADDSOMETHING":
-        case "USER_FETCH_SUCCEEDED":
+        case A_LOAD_ASYNC.SUCCESS:
             return Object.assign({}, state, { ...action.payload }, { date: Date.now() });
         default: return state;
     }
-
 };

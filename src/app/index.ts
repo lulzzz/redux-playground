@@ -4,8 +4,8 @@ export { ViewElement } from './view';
 import { store, sagaMiddleware } from './store';
 import view from './view';
 import reducerRegistry from './redux/reducerRegistry';
-import actionRegistry, { Entry, Entries } from './redux/actionRegistry';
-import { Reducer } from 'redux';
+import actionRegistry, { ActionFunction, Entries } from './redux/actionRegistry';
+import { Reducer, Store } from 'redux';
 
 const subject = new BehaviorSubject(store.getState());
 store.subscribe(() => subject.next(store.getState()));
@@ -14,14 +14,18 @@ view(store, document.body);
 
 
 export interface App {
-    action(name: string, entry: Entry): App;
+    readonly store: Store;
+    action<T>(name: string, entry: ActionFunction<T>): App;
     actions(entries: Entries): App;
     reducer(name: string, reducer: Reducer): App;
     saga(entry: () => Iterator<any>): App;
 };
 
 const app: App = {
-    action(name: string, entry: Entry): App {
+
+    get store() { return store },
+
+    action<T>(name: string, entry: ActionFunction<T>): App {
         actionRegistry.register(name, entry);
         return this;
     },

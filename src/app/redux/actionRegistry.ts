@@ -1,10 +1,6 @@
-import { Action } from "rxjs/internal/scheduler/Action";
+
 import { AnyAction } from "redux";
 
-
-export interface Entry {
-    (): any;
-}
 
 export interface ActionFunction<T> {
     (T?: any): AnyAction
@@ -12,7 +8,7 @@ export interface ActionFunction<T> {
 
 
 export interface Entries {
-    [key: string]: Entry;
+    [key: string]: ActionFunction<any>;
 }
 
 class ActionRegistry {
@@ -21,8 +17,7 @@ class ActionRegistry {
 
     }
 
-    register(name: string, entry: Entry) {
-        console.log('register', name, entry)
+    register<T>(name: string, entry: ActionFunction<T>) {
         this.entries = { ...this.entries, [name]: entry };
     }
 

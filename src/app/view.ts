@@ -21,7 +21,7 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
 
     connectedCallback() {
         const state = this.getAttribute('state');
-        console.log(this);
+
         if (!this.observable) {
             return;
         }
@@ -31,11 +31,12 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
             const mapper = new Function('state', 'index', 'return state.' + state) as Mapper<T>;
             observer = observer.pipe(map(mapper));
         }
-        observer.pipe(distinctUntilChanged()).subscribe((next: T) => this.update(next));
+        observer.pipe(distinctUntilChanged())
+            .pipe(map(value => value ? value : {}))
+            .subscribe((next: T) => this.update(next));
         this.addEventListener('click', this);
     }
     disconnectedCallback() {
-        console.log(`disconnected: ${this.localName}`);
         this.removeEventListener('click', this);
     }
 
@@ -58,7 +59,6 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
                     break;
                 }
             }
-            console.log(event.type, (event as any).composedPath());
         }
     }
 
@@ -78,7 +78,7 @@ export abstract class ViewElement<T> extends HTMLElement implements EventListene
 export default (store: Store, element: Element) => {
     const subject = new BehaviorSubject(store.getState());
     store.subscribe(() => subject.next(store.getState()));
-    console.log('define me', store);
+
     Object.defineProperty(ViewElement.prototype, 'observable', {
         get: () => subject
     });
@@ -91,9 +91,9 @@ export default (store: Store, element: Element) => {
         // dispatch the action on the store
         // needs an action resolver which it can call to get the registered action 
         // like -> store.dispatch(actionRegistry(type)(data));
-        
+
         const action = actionRegistry.resolve<any>(type);
-        console.log(type, action)
+
         if (action) {
             store.dispatch(action(data));
         }
